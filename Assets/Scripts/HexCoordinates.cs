@@ -1,16 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [System.Serializable]
-public class HexCoordinates
+public struct HexCoordinates
 {
 	[SerializeField]
 	private int x, z;
 
-    public int X { get { return x; } }
-	public int Z { get { return z; } }
-	public int Y { get { return -X - Z; } }
+	public int X
+	{
+		get { return x; }
+	}
+
+	public int Z
+	{
+		get { return z; }
+	}
+
+	public int Y
+	{
+		get { return -X - Z; }
+	}
 
 	public HexCoordinates(int x, int z)
 	{
@@ -27,6 +36,7 @@ public class HexCoordinates
 	{
 		float x = position.x / (HexMetrics.innerRadius * 2f);
 		float y = -x;
+
 		float offset = position.z / (HexMetrics.outerRadius * 3f);
 		x -= offset;
 		y -= offset;

@@ -1,10 +1,5 @@
 ﻿using UnityEngine;
 
-public enum HexEdgeType
-{
-	Flat, Slope, Cliff
-}
-
 public static class HexMetrics
 {
 	public const float outerRadius = 10f;
@@ -17,8 +12,16 @@ public static class HexMetrics
 
 	public const int terracesPerSlope = 2;
 	public const int terraceSteps = terracesPerSlope * 2 + 1;
+
 	public const float horizontalTerraceStepSize = 1f / terraceSteps;
 	public const float verticalTerraceStepSize = 1f / (terracesPerSlope + 1);
+
+	public const float cellPerturbStrength = 4f;
+	public const float elevationPerturbStrength = 1.5f;
+
+	public const float noiseScale = 0.003f;
+
+	public const int chunkSizeX = 5, chunkSizeZ = 5;
 
 	static Vector3[] corners = 
 	{
@@ -33,36 +36,34 @@ public static class HexMetrics
 
 	public static Texture2D noiseSource;
 
-	public const float cellPerturbStrength = 4f;
+	public static Vector4 SampleNoise(Vector3 position)
+	{
+		return noiseSource.GetPixelBilinear(position.x * noiseScale, position.z * noiseScale);
+	}
 
-	public const float noiseScale = 0.003f;
-
-	public const float elevationPerturbStrength = 1.5f;
-
-	public static Vector3 GetFirstCorner (HexDirection direction)
+	public static Vector3 GetFirstCorner(HexDirection direction)
 	{
 		return corners[(int)direction];
 	}
 
-	public static Vector3 GetSecondCorner (HexDirection direction)
+	public static Vector3 GetSecondCorner(HexDirection direction)
 	{
 		return corners[(int)direction + 1];
 	}
 
-	public static Vector3 GetFirstSolidCorner (HexDirection direction)
+	public static Vector3 GetFirstSolidCorner(HexDirection direction)
 	{
 		return corners[(int)direction] * solidFactor;
 	}
 
-	public static Vector3 GetSecondSolidCorner (HexDirection direction)
+	public static Vector3 GetSecondSolidCorner(HexDirection direction)
 	{
 		return corners[(int)direction + 1] * solidFactor;
 	}
 
-	public static Vector3 GetBridge (HexDirection direction)
+	public static Vector3 GetBridge(HexDirection direction)
 	{
-		return (corners[(int)direction] + corners[(int)direction + 1]) *
-			blendFactor;
+		return (corners[(int)direction] + corners[(int)direction + 1]) * blendFactor;
 	}
 
 	public static Vector3 TerraceLerp(Vector3 a, Vector3 b, int step)
@@ -93,10 +94,5 @@ public static class HexMetrics
 			return HexEdgeType.Slope;
 		}
 		return HexEdgeType.Cliff;
-	}
-
-	public static Vector4 SampleNoise(Vector3 position)
-	{
-		return noiseSource.GetPixelBilinear(position.x * noiseScale, position.z * noiseScale);
 	}
 }
