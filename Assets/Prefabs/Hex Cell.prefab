@@ -48,6 +48,7 @@ MonoBehaviour:
     z: 0
   uiRect: {fileID: 0}
   chunk: {fileID: 0}
+  roads: 000000000000
   neighbors:
   - {fileID: 0}
   - {fileID: 0}

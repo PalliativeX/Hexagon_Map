@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: River Materia
-  m_Shader: {fileID: 4800000, guid: 1f13e824ff406ba4080a4396b9abc9ad, type: 3}
+  m_Name: Road Material
+  m_Shader: {fileID: 4800000, guid: bf649adb780b90d469f6e07d7ac1b20e, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -73,5 +73,5 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.0141509175, g: 0.23682807, b: 1, a: 0.2784314}
+    - _Color: {r: 0.9056604, g: 0.09825563, b: 0.09825563, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
