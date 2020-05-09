@@ -1,13 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-enum OptionalToggle
-{
-	Ignore, Yes, No
-}
+public class HexMapEditor : MonoBehaviour {
 
-public class HexMapEditor : MonoBehaviour
-{
 	public Color[] colors;
 
 	public HexGrid hexGrid;
@@ -15,9 +10,21 @@ public class HexMapEditor : MonoBehaviour
 	int activeElevation;
 	int activeWaterLevel;
 
+	int activeUrbanLevel, activeFarmLevel, activePlantLevel;
+
 	Color activeColor;
 
 	int brushSize;
+
+	bool applyColor;
+	bool applyElevation = true;
+	bool applyWaterLevel = true;
+
+	bool applyUrbanLevel, applyFarmLevel, applyPlantLevel;
+
+	enum OptionalToggle {
+		Ignore, Yes, No
+	}
 
 	OptionalToggle riverMode, roadMode;
 
@@ -25,106 +32,111 @@ public class HexMapEditor : MonoBehaviour
 	HexDirection dragDirection;
 	HexCell previousCell;
 
-	bool applyColor;
-	bool applyElevation = true;
-	bool applyWaterLevel = true;
-
-	public void SetRiverMode(int mode)
-	{
-		riverMode = (OptionalToggle)mode;
-	}
-
-	public void SetRoadMode(int mode)
-	{
-		roadMode = (OptionalToggle)mode;
-	}
-
-	public void SelectColor(int index)
-	{
+	public void SelectColor (int index) {
 		applyColor = index >= 0;
-		if (applyColor)
-		{
+		if (applyColor) {
 			activeColor = colors[index];
 		}
 	}
 
-	public void SetApplyElevation(bool toggle)
-	{
+	public void SetApplyElevation (bool toggle) {
 		applyElevation = toggle;
 	}
 
-	public void SetElevation(float elevation)
-	{
+	public void SetElevation (float elevation) {
 		activeElevation = (int)elevation;
 	}
 
-	public void SetApplyWaterLevel(bool toggle)
-	{
+	public void SetApplyWaterLevel (bool toggle) {
 		applyWaterLevel = toggle;
 	}
 
-	public void SetWaterLevel(float level)
-	{
+	public void SetWaterLevel (float level) {
 		activeWaterLevel = (int)level;
 	}
 
-	public void SetBrushSize(float size)
-	{
+	public void SetApplyUrbanLevel (bool toggle) {
+		applyUrbanLevel = toggle;
+	}
+
+	public void SetUrbanLevel (float level) {
+		activeUrbanLevel = (int)level;
+	}
+
+	public void SetApplyFarmLevel (bool toggle) {
+		applyFarmLevel = toggle;
+	}
+
+	public void SetFarmLevel (float level) {
+		activeFarmLevel = (int)level;
+	}
+
+	public void SetApplyPlantLevel (bool toggle) {
+		applyPlantLevel = toggle;
+	}
+
+	public void SetPlantLevel (float level) {
+		activePlantLevel = (int)level;
+	}
+
+	public void SetBrushSize (float size) {
 		brushSize = (int)size;
 	}
 
-	public void ShowUI(bool visible)
-	{
+	public void SetRiverMode (int mode) {
+		riverMode = (OptionalToggle)mode;
+	}
+
+	public void SetRoadMode (int mode) {
+		roadMode = (OptionalToggle)mode;
+	}
+
+	public void ShowUI (bool visible) {
 		hexGrid.ShowUI(visible);
 	}
 
-	void Awake()
-	{
+	void Awake () {
 		SelectColor(0);
 	}
 
-	void Update()
-	{
-		if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
-		{
+	void Update () {
+		if (
+			Input.GetMouseButton(0) &&
+			!EventSystem.current.IsPointerOverGameObject()
+		) {
 			HandleInput();
 		}
-		else
-		{
+		else {
 			previousCell = null;
 		}
 	}
 
-	void HandleInput()
-	{
+	void HandleInput () {
 		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
-		if (Physics.Raycast(inputRay, out hit))
-		{
+		if (Physics.Raycast(inputRay, out hit)) {
 			HexCell currentCell = hexGrid.GetCell(hit.point);
-			if (previousCell && previousCell != currentCell)
-			{
+			if (previousCell && previousCell != currentCell) {
 				ValidateDrag(currentCell);
 			}
-			else
-			{
+			else {
 				isDrag = false;
 			}
 			EditCells(currentCell);
 			previousCell = currentCell;
 		}
-		else
-		{
+		else {
 			previousCell = null;
 		}
 	}
 
-	void ValidateDrag(HexCell currentCell)
-	{
-		for (dragDirection = HexDirection.NE; dragDirection <= HexDirection.NW; dragDirection++)
-		{
-			if (previousCell.GetNeighbor(dragDirection) == currentCell)
-			{
+	void ValidateDrag (HexCell currentCell) {
+		for (
+			dragDirection = HexDirection.NE;
+			dragDirection <= HexDirection.NW;
+			dragDirection++
+		) {
+			if (previousCell.GetNeighbor(dragDirection) == currentCell) {
 				isDrag = true;
 				return;
 			}
@@ -132,65 +144,59 @@ public class HexMapEditor : MonoBehaviour
 		isDrag = false;
 	}
 
-	void EditCells(HexCell center)
-	{
+	void EditCells (HexCell center) {
 		int centerX = center.coordinates.X;
 		int centerZ = center.coordinates.Z;
 
-		for (int r = 0, z = centerZ - brushSize; z <= centerZ; z++, r++)
-		{
-			for (int x = centerX - r; x <= centerX + brushSize; x++)
-			{
+		for (int r = 0, z = centerZ - brushSize; z <= centerZ; z++, r++) {
+			for (int x = centerX - r; x <= centerX + brushSize; x++) {
 				EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
 			}
 		}
-		for (int r = 0, z = centerZ + brushSize; z > centerZ; z--, r++)
-		{
-			for (int x = centerX - brushSize; x <= centerX + r; x++)
-			{
+		for (int r = 0, z = centerZ + brushSize; z > centerZ; z--, r++) {
+			for (int x = centerX - brushSize; x <= centerX + r; x++) {
 				EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
 			}
 		}
 	}
 
-	void EditCell(HexCell cell)
-	{
-		if (cell)
-		{
-			if (applyColor)
-			{
+	void EditCell (HexCell cell) {
+		if (cell) {
+			if (applyColor) {
 				cell.Color = activeColor;
 			}
-			if (applyElevation)
-			{
+			if (applyElevation) {
 				cell.Elevation = activeElevation;
 			}
-			if (applyWaterLevel)
-			{
+			if (applyWaterLevel) {
 				cell.WaterLevel = activeWaterLevel;
 			}
-			if (riverMode == OptionalToggle.No)
-			{
+			if (applyUrbanLevel) {
+				cell.UrbanLevel = activeUrbanLevel;
+			}
+			if (applyFarmLevel) {
+				cell.FarmLevel = activeFarmLevel;
+			}
+			if (applyPlantLevel) {
+				cell.PlantLevel = activePlantLevel;
+			}
+			if (riverMode == OptionalToggle.No) {
 				cell.RemoveRiver();
 			}
-			if (roadMode == OptionalToggle.No)
-			{
+			if (roadMode == OptionalToggle.No) {
 				cell.RemoveRoads();
 			}
-			if (isDrag)
-			{
+			if (isDrag) {
 				HexCell otherCell = cell.GetNeighbor(dragDirection.Opposite());
-				if (otherCell)
-				{
-					if (riverMode == OptionalToggle.Yes)
+				if (otherCell) {
+					if (riverMode == OptionalToggle.Yes) {
 						otherCell.SetOutgoingRiver(dragDirection);
-					if (roadMode == OptionalToggle.Yes)
+					}
+					if (roadMode == OptionalToggle.Yes) {
 						otherCell.AddRoad(dragDirection);
+					}
 				}
 			}
 		}
-
 	}
-
-
 }
