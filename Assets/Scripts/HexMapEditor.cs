@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class HexMapEditor : MonoBehaviour {
-
+public class HexMapEditor : MonoBehaviour
+{
 	public Color[] colors;
 
 	public HexGrid hexGrid;
@@ -26,7 +26,7 @@ public class HexMapEditor : MonoBehaviour {
 		Ignore, Yes, No
 	}
 
-	OptionalToggle riverMode, roadMode;
+	OptionalToggle riverMode, roadMode, walledMode;
 
 	bool isDrag;
 	HexDirection dragDirection;
@@ -37,6 +37,11 @@ public class HexMapEditor : MonoBehaviour {
 		if (applyColor) {
 			activeColor = colors[index];
 		}
+	}
+
+	public void SetWalledMode(int mode)
+	{
+		walledMode = (OptionalToggle)mode;
 	}
 
 	public void SetApplyElevation (bool toggle) {
@@ -185,6 +190,10 @@ public class HexMapEditor : MonoBehaviour {
 			}
 			if (roadMode == OptionalToggle.No) {
 				cell.RemoveRoads();
+			}
+			if (walledMode != OptionalToggle.Ignore)
+			{
+				cell.Walled = walledMode == OptionalToggle.Yes;
 			}
 			if (isDrag) {
 				HexCell otherCell = cell.GetNeighbor(dragDirection.Opposite());
