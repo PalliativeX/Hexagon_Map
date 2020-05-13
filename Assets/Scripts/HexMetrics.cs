@@ -45,12 +45,15 @@ public static class HexMetrics
 	public const float hashGridScale = 0.25f;
 
 	public const float wallHeight = 3f;
+	public const float wallYOffset = -1f;
 	public const float wallThickness = 0.75f;
 	public const float wallElevationOffset = verticalTerraceStepSize;
 
 	static HexHash[] hashGrid;
 
-	static Vector3[] corners = 
+	public static Color[] colors;
+
+	static readonly Vector3[] corners = 
 	{
 		new Vector3(0f, 0f, outerRadius),
 		new Vector3(innerRadius, 0f, 0.5f * outerRadius),
@@ -61,12 +64,16 @@ public static class HexMetrics
 		new Vector3(0f, 0f, outerRadius)
 	};
 
-	static float[][] featureThresholds = 
+	static readonly float[][] featureThresholds = 
 	{
 		new float[] {0.0f, 0.0f, 0.4f},
 		new float[] {0.0f, 0.4f, 0.6f},
 		new float[] {0.4f, 0.6f, 0.8f}
 	};
+
+	public const float wallTowerThreshold = 0.5f;
+
+	public const float bridgeDesignLength = 7f;
 
 	public static Texture2D noiseSource;
 
@@ -119,7 +126,7 @@ public static class HexMetrics
 		near.x += (far.x - near.x) * 0.5f;
 		near.z += (far.z - near.z) * 0.5f;
 		float v = near.y < far.y ? wallElevationOffset : (1f - wallElevationOffset);
-		near.y += (far.y - near.y) * v;
+		near.y += (far.y - near.y) * v + wallYOffset;
 		return near;
 	}
 

@@ -4,7 +4,7 @@
 public struct HexCoordinates {
 
 	[SerializeField]
-	private int x, z;
+	private readonly int x, z;
 
 	public int X {
 		get {

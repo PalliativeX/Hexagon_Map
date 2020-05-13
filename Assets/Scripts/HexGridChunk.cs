@@ -72,9 +72,17 @@ public class HexGridChunk : MonoBehaviour
 		{
 			Triangulate(d, cell);
 		}
-		if (!cell.IsUnderwater && !cell.HasRiver && !cell.HasRoads)
+
+		if (!cell.IsUnderwater)
 		{
-			features.AddFeature(cell, cell.Position);
+			if (!cell.HasRiver && !cell.HasRoads)
+			{
+				features.AddFeature(cell, cell.Position);
+			}
+			if (cell.IsSpecial)
+			{
+				features.AddSpecialFeature(cell, cell.Position);
+			}
 		}
 	}
 
@@ -369,9 +377,7 @@ public class HexGridChunk : MonoBehaviour
 		}
 	}
 
-	void TriangulateRoadAdjacentToRiver(
-		HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e
-	)
+	void TriangulateRoadAdjacentToRiver(HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e)
 	{
 		bool hasRoadThroughEdge = cell.HasRoadThroughEdge(direction);
 		bool previousHasRiver = cell.HasRiverThroughEdge(direction.Previous());
@@ -381,19 +387,14 @@ public class HexGridChunk : MonoBehaviour
 
 		if (cell.HasRiverBeginOrEnd)
 		{
-			roadCenter += HexMetrics.GetSolidEdgeMiddle(
-				cell.RiverBeginOrEndDirection.Opposite()
-			) * (1f / 3f);
+			roadCenter += HexMetrics.GetSolidEdgeMiddle(cell.RiverBeginOrEndDirection.Opposite()) * (1f / 3f);
 		}
 		else if (cell.IncomingRiver == cell.OutgoingRiver.Opposite())
 		{
 			Vector3 corner;
 			if (previousHasRiver)
 			{
-				if (
-					!hasRoadThroughEdge &&
-					!cell.HasRoadThroughEdge(direction.Next())
-				)
+				if (!hasRoadThroughEdge && !cell.HasRoadThroughEdge(direction.Next()))
 				{
 					return;
 				}
@@ -401,16 +402,17 @@ public class HexGridChunk : MonoBehaviour
 			}
 			else
 			{
-				if (
-					!hasRoadThroughEdge &&
-					!cell.HasRoadThroughEdge(direction.Previous())
-				)
+				if (!hasRoadThroughEdge && !cell.HasRoadThroughEdge(direction.Previous()))
 				{
 					return;
 				}
 				corner = HexMetrics.GetFirstSolidCorner(direction);
 			}
 			roadCenter += corner * 0.5f;
+			if (cell.IncomingRiver == direction.Next() && (cell.HasRoadThroughEdge(direction.Next2()) || cell.HasRoadThroughEdge(direction.Opposite())))
+			{
+				features.AddBridge(roadCenter, center - corner * 0.5f);
+			}
 			center += corner * 0.25f;
 		}
 		else if (cell.IncomingRiver == cell.OutgoingRiver.Previous())
@@ -455,7 +457,10 @@ public class HexGridChunk : MonoBehaviour
 			{
 				return;
 			}
-			roadCenter += HexMetrics.GetSolidEdgeMiddle(middle) * 0.25f;
+			Vector3 offset = HexMetrics.GetSolidEdgeMiddle(middle);
+			roadCenter += offset * 0.25f;
+			if (direction == middle && cell.HasRoadThroughEdge(direction.Opposite()))
+				features.AddBridge(roadCenter, center - offset * (HexMetrics.innerToOuter * 0.7f));
 		}
 
 		Vector3 mL = Vector3.Lerp(roadCenter, e.v1, interpolators.x);
@@ -471,9 +476,7 @@ public class HexGridChunk : MonoBehaviour
 		}
 	}
 
-	void TriangulateWithRiverBeginOrEnd(
-		HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e
-	)
+	void TriangulateWithRiverBeginOrEnd(HexDirection direction, HexCell cell, Vector3 center, EdgeVertices e)
 	{
 		EdgeVertices m = new EdgeVertices(
 			Vector3.Lerp(center, e.v1, 0.5f),

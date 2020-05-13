@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Road Material
-  m_Shader: {fileID: 4800000, guid: bf649adb780b90d469f6e07d7ac1b20e, type: 3}
+  m_Shader: {fileID: 4800000, guid: 779174cb380314c898e70529020522f6, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
