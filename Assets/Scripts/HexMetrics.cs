@@ -51,8 +51,6 @@ public static class HexMetrics
 
 	static HexHash[] hashGrid;
 
-	public static Color[] colors;
-
 	static readonly Vector3[] corners = 
 	{
 		new Vector3(0f, 0f, outerRadius),

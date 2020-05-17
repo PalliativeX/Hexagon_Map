@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.IO;
+using UnityEngine.UI;
 
 public class HexCell : MonoBehaviour
 {
@@ -9,9 +10,22 @@ public class HexCell : MonoBehaviour
 
 	public HexGridChunk chunk;
 
-	public Color Color
+	int distance;
+
+	void UpdateDistanceLabel()
 	{
-		get { return HexMetrics.colors[terrainTypeIndex]; }
+		Text label = uiRect.GetComponent<Text>();
+		label.text = distance == int.MaxValue ? " " : distance.ToString();
+	}
+
+	public int Distance
+	{
+		get { return distance; }
+		set 
+		{
+			distance = value;
+			UpdateDistanceLabel();
+		}
 	}
 
 	public int TerrainTypeIndex
