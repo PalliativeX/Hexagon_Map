@@ -12,10 +12,36 @@ public class HexCell : MonoBehaviour
 
 	int distance;
 
-	void UpdateDistanceLabel()
+	public int SearchHeuristic { get; set; }
+
+	public HexCell PathFrom { get; set; }
+
+	public int SearchPhase { get; set; }
+
+	public int SearchPriority
 	{
-		Text label = uiRect.GetComponent<Text>();
-		label.text = distance == int.MaxValue ? " " : distance.ToString();
+		get { return distance + SearchHeuristic; }
+	}
+
+	public HexCell NextWithSamePriority;
+
+	public void SetLabel(string text)
+	{
+		UnityEngine.UI.Text label = uiRect.GetComponent<Text>();
+		label.text = text;
+	}
+
+	public void DisableHighlight()
+	{
+		Image highlight = uiRect.GetChild(0).GetComponent<Image>();
+		highlight.enabled = false;
+	}
+
+	public void EnableHighlight(Color color)
+	{
+		Image highlight = uiRect.GetChild(0).GetComponent<Image>();
+		highlight.color = color;
+		highlight.enabled = true;
 	}
 
 	public int Distance
@@ -24,7 +50,6 @@ public class HexCell : MonoBehaviour
 		set 
 		{
 			distance = value;
-			UpdateDistanceLabel();
 		}
 	}
 
