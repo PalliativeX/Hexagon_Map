@@ -27,11 +27,31 @@ public class HexGrid : MonoBehaviour
 	HexCell currentPathFrom, currentPathTo;
 	bool currentPathExists;
 
+	public HexUnit unitPrefab;
+
+	List<HexUnit> units = new List<HexUnit>();
+
+	public bool HasPath
+	{
+		get { return currentPathExists; }
+	}
+
 	void Awake()
 	{
 		HexMetrics.noiseSource = noiseSource;
 		HexMetrics.InitializeHashGrid(seed);
+		HexUnit.unitPrefab = unitPrefab;
 		CreateMap(cellCountX, cellCountZ);
+	}
+
+	void OnEnable()
+	{
+		if (!HexMetrics.noiseSource)
+		{
+			HexMetrics.noiseSource = noiseSource;
+			HexMetrics.InitializeHashGrid(seed);
+			HexUnit.unitPrefab = unitPrefab;
+		}
 	}
 
 	public bool CreateMap(int x, int z)
@@ -44,6 +64,7 @@ public class HexGrid : MonoBehaviour
 		}
 
 		ClearPath();
+		ClearUnits();
 		if (chunks != null)
 		{
 			for (int i = 0; i < chunks.Length; i++)
@@ -90,15 +111,6 @@ public class HexGrid : MonoBehaviour
 		}
 	}
 
-	void OnEnable()
-	{
-		if (!HexMetrics.noiseSource)
-		{
-			HexMetrics.noiseSource = noiseSource;
-			HexMetrics.InitializeHashGrid(seed);
-		}
-	}
-
 	public void Save(BinaryWriter writer)
 	{
 		writer.Write(cellCountX);
@@ -108,11 +120,18 @@ public class HexGrid : MonoBehaviour
 		{
 			cells[i].Save(writer);
 		}
+
+		writer.Write(units.Count);
+		for (int i = 0; i < units.Count; i++)
+		{
+			units[i].Save(writer);
+		}
 	}
 
 	public void Load(BinaryReader reader, int header)
 	{
 		ClearPath();
+		ClearUnits();
 
 		int x = 20, z = 15;
 		if (header >= 1)
@@ -135,6 +154,39 @@ public class HexGrid : MonoBehaviour
 		{
 			chunks[i].Refresh();
 		}
+
+		if (header >= 2)
+		{
+			int unitCount = reader.ReadInt32();
+			for (int i = 0; i < unitCount; i++)
+			{
+				HexUnit.Load(reader, this);
+			}
+		}
+
+	}
+
+	public void AddUnit(HexUnit unit, HexCell location, float orientation)
+	{
+		units.Add(unit);
+		unit.transform.SetParent(transform, false);
+		unit.Location = location;
+		unit.Orientation = orientation;
+	}
+
+	public void RemoveUnit(HexUnit unit)
+	{
+		units.Remove(unit);
+		unit.Die();
+	}
+
+	public HexCell GetCell(Ray ray)
+	{
+		if (Physics.Raycast(ray, out RaycastHit hit))
+		{
+			return GetCell(hit.point);
+		}
+		return null;
 	}
 
 	public HexCell GetCell(Vector3 position)
@@ -225,6 +277,15 @@ public class HexGrid : MonoBehaviour
 		chunk.AddCell(localX + localZ * HexMetrics.chunkSizeX, cell);
 	}
 
+	void ClearUnits()
+	{
+		for (int i = 0; i < units.Count; i++)
+		{
+			units[i].Die();
+		}
+		units.Clear();
+	}
+
 	public void FindPath(HexCell fromCell, HexCell toCell, int speed)
 	{
 		ClearPath();
@@ -260,14 +321,14 @@ public class HexGrid : MonoBehaviour
 				return true;
 			}
 
-			int currentTurn = current.Distance / speed;
+			int currentTurn = (current.Distance - 1) / speed;
 
 			for (HexDirection d = HexDirection.NE; d <= HexDirection.NW; d++)
 			{
 				HexCell neighbor = current.GetNeighbor(d);
 				if (neighbor == null || neighbor.SearchPhase > searchFrontierPhase)
 					continue;
-				if (neighbor.IsUnderwater)
+				if (neighbor.IsUnderwater || neighbor.Unit)
 					continue;
 
 				HexEdgeType edgeType = current.GetEdgeType(neighbor);
@@ -290,7 +351,7 @@ public class HexGrid : MonoBehaviour
 				}
 
 				int distance = current.Distance + moveCost;
-				int turn = distance / speed;
+				int turn = (distance - 1) / speed;
 				if (turn > currentTurn)
 				{
 					distance = turn * speed + moveCost;
@@ -325,7 +386,7 @@ public class HexGrid : MonoBehaviour
 			HexCell current = currentPathTo;
 			while (current != currentPathFrom)
 			{
-				int turn = current.Distance / speed;
+				int turn = (current.Distance - 1) / speed;
 				current.SetLabel(turn.ToString());
 				current.EnableHighlight(Color.white);
 				current = current.PathFrom;
@@ -335,7 +396,22 @@ public class HexGrid : MonoBehaviour
 		currentPathTo.EnableHighlight(Color.red);
 	}
 
-	void ClearPath()
+	public List<HexCell> GetPath()
+	{
+		if (!currentPathExists)
+			return null;
+
+		List<HexCell> path = ListPool<HexCell>.Get();
+		for (HexCell c = currentPathTo; c != currentPathFrom; c = c.PathFrom)
+		{
+			path.Add(c);
+		}
+		path.Add(currentPathFrom);
+		path.Reverse();
+		return path;
+	}
+
+	public void ClearPath()
 	{
 		if (currentPathExists)
 		{

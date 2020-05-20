@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
+using System.IO;
 
 [System.Serializable]
 public struct HexCoordinates {
 
 	[SerializeField]
-	private readonly int x, z;
+	private int x, z;
 
 	public int X {
 		get {
@@ -27,6 +28,20 @@ public struct HexCoordinates {
 	public HexCoordinates (int x, int z) {
 		this.x = x;
 		this.z = z;
+	}
+
+	public void Save(BinaryWriter writer)
+	{
+		writer.Write(x);
+		writer.Write(z);
+	}
+
+	public static HexCoordinates Load(BinaryReader reader)
+	{
+		HexCoordinates c;
+		c.x = reader.ReadInt32();
+		c.z = reader.ReadInt32();
+		return c;
 	}
 
 	public static HexCoordinates FromOffsetCoordinates (int x, int z) {

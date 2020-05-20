@@ -18,6 +18,8 @@ public class HexCell : MonoBehaviour
 
 	public int SearchPhase { get; set; }
 
+	public HexUnit Unit { get; set; }
+
 	public int SearchPriority
 	{
 		get { return distance + SearchHeuristic; }
@@ -560,6 +562,12 @@ public class HexCell : MonoBehaviour
 		if (chunk)
 		{
 			chunk.Refresh();
+
+			if (Unit)
+			{
+				Unit.ValidateLocation();
+			}
+
 			for (int i = 0; i < neighbors.Length; i++)
 			{
 				HexCell neighbor = neighbors[i];
@@ -574,5 +582,9 @@ public class HexCell : MonoBehaviour
 	void RefreshSelfOnly()
 	{
 		chunk.Refresh();
+		if (Unit)
+		{
+			Unit.ValidateLocation();
+		}
 	}
 }
