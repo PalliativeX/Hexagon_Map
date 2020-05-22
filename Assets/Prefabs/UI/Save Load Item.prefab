@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 222225118148573466}
   - component: {fileID: 114491039834902428}
   - component: {fileID: 114011251300337122}
-  - component: {fileID: 5391837664560270532}
+  - component: {fileID: 114778907200386024}
   m_Layer: 5
   m_Name: Save Load Item
   m_TagString: Untagged
@@ -196,7 +196,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5391837664560270532}
+      - m_Target: {fileID: 114778907200386024}
         m_MethodName: Select
         m_Mode: 1
         m_Arguments:
@@ -207,7 +207,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &5391837664560270532
+--- !u!114 &114778907200386024
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -216,7 +216,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1986887027317424}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3ce4005b119f484ab1c58e4605214b0, type: 3}
+  m_Script: {fileID: 11500000, guid: 84d64ed4125fb4086961b35c40cb2529, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   menu: {fileID: 0}
