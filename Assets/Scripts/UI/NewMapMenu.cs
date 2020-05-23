@@ -2,8 +2,11 @@
 
 public class NewMapMenu : MonoBehaviour
 {
-
 	public HexGrid hexGrid;
+
+	bool generateMaps = true;
+
+	public HexMapGenerator mapGenerator;
 
 	public void Open()
 	{
@@ -32,9 +35,21 @@ public class NewMapMenu : MonoBehaviour
 		CreateMap(80, 60);
 	}
 
+	public void ToggleMapGeneration(bool toggle)
+	{
+		generateMaps = toggle;
+	}
+
 	void CreateMap(int x, int z)
 	{
-		hexGrid.CreateMap(x, z);
+		if (generateMaps)
+		{
+			mapGenerator.GenerateMap(x, z);
+		}
+		else
+		{
+			hexGrid.CreateMap(x, z);
+		}
 		HexMapCamera.ValidatePosition();
 		Close();
 	}
