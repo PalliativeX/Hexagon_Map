@@ -220,6 +220,11 @@ public class HexCell : MonoBehaviour
 		}
 	}
 
+	public int ColumnIndex
+	{
+		get; set;
+	}
+
 	public int SpecialIndex
 	{
 		get {
@@ -615,6 +620,11 @@ public class HexCell : MonoBehaviour
 		}
 		writer.Write((byte)roadFlags);
 		writer.Write(IsExplored);
+	}
+
+	public void SetMapData(float data)
+	{
+		ShaderData.SetMapData(this, data);
 	}
 
 	public void Load(BinaryReader reader, int header)
